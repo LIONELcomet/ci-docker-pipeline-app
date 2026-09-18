@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout Code
         uses: actions/checkout@v4
 
@@ -15,23 +16,30 @@ jobs:
           docker build -t ci-docker-app:${{ github.sha }} .
 
       - name: Run Container
-        run: |
-          docker run -d `
-            --name ci-docker-app `
-            -p 3001:3000 `
-            ci-docker-app:${{ github.sha }}
+        run: docker run -d --name ci-docker-app -p 3001:3000 ci-docker-app:${{ github.sha }}
 
       - name: Wait for Application
-        run: |
-          sleep 10
+        run: sleep 10
 
       - name: Health Check
         run: |
           echo "Checking application health..."
           curl --fail http://localhost:3001/health
+          echo "Health check passed successfully."
 
-      - name: Container Status
+      - name: Container Health Status
+        run: |
+          echo "Checking Docker container status..."
+          docker ps -a
+          docker inspect --format='{{.State.Health.Status}}' ci-docker-app || true
+
+      - name: Application Logs
         if: always()
         run: |
-          docker ps -a
+          echo "===== APPLICATION LOGS ====="
           docker logs ci-docker-app || true
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker rm -f ci-docker-app || true
