@@ -1,0 +1,12 @@
+{
+  "name": "ci-docker-pipeline-app",
+  "version": "1.0.0",
+  "description": "Docker CI/CD health check and rollback application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
