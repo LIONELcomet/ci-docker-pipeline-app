@@ -8,12 +8,11 @@ app.get("/", (req, res) => {
 });
 
 app.get("/health", (req, res) => {
-    res.status(500).json({
-        status: "DOWN",
-        message: "Simulated deployment failure"
+    res.status(200).json({
+        status: "UP",
+        message: "Application is healthy"
     });
 });
-
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
