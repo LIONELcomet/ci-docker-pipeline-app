@@ -1,0 +1,37 @@
+name: Docker CI Pipeline
+
+on: [push]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: |
+          docker build -t ci-docker-app:${{ github.sha }} .
+
+      - name: Run Container
+        run: |
+          docker run -d `
+            --name ci-docker-app `
+            -p 3001:3000 `
+            ci-docker-app:${{ github.sha }}
+
+      - name: Wait for Application
+        run: |
+          sleep 10
+
+      - name: Health Check
+        run: |
+          echo "Checking application health..."
+          curl --fail http://localhost:3001/health
+
+      - name: Container Status
+        if: always()
+        run: |
+          docker ps -a
+          docker logs ci-docker-app || true
